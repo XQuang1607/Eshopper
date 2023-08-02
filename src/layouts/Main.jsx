@@ -8,8 +8,10 @@ import Categories from '@/components/Categories'
 import Offer from '@/components/Offer'
 import FlashSale from '@/components/FalshSaleProducts'
 import BestSale from '@/components/BestSellerProducts';
+import LoginForm from '@/pages/register';
 
 const Main = ({productsOfCategoryShop, productsOfCateogory, flashSale,bestsale}) => {
+
   const [cartItems, setCartItems] = useState(0); // Ban đầu số lượng hàng trong giỏ hàng là 0
 
   useEffect(() => {
@@ -36,6 +38,7 @@ const Main = ({productsOfCategoryShop, productsOfCateogory, flashSale,bestsale})
         <Offer />
         <FlashSale flashSale={flashSale} handleAddToCart={handleAddToCart}/>
         <BestSale bestsale={bestsale} handleAddToCart={handleAddToCart}/>
+      {/* Rest of your app */}
         <Footer />
     <ButtonScroll />
     </div>

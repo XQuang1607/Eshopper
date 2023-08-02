@@ -9970,5 +9970,9 @@ a.text-dark:focus {
     }
 }
 
+a.btn:hover {
+    color: #C17A74;
+}
+
 
 /*  */
