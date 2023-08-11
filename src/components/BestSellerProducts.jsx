@@ -12,10 +12,10 @@ const BestSale = ({ bestsale, handleAddToCart  }) => {
         </div>
         <div className="row px-xl-5 pb-3">
           {bestsale.map((flash) => (
-            <div className="col-lg-3 col-md-6 col-sm-12 pb-1">
+            <div className="col-lg-3 col-md-6 col-sm-12 pb-1" key={flash._id}>
               <Link
                 // style={{ height: "80px" }}
-                key={flash._id}
+                // key={flash._id}
                 href={`/products/${flash._id}`}
               >
                 <div className="card product-item border-0 mb-4">

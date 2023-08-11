@@ -217,10 +217,10 @@ function Shop({ products, productsOfCategoryShop }) {
                 </div>
               </div>
               {currentProducts.map((p) => (
-                <div className="col-lg-4 col-md-6 col-sm-12 pb-1">
+                <div className="col-lg-4 col-md-6 col-sm-12 pb-1" key={p._id}>
                   <Link
                     // style={{ height: "80px" }}
-                    key={p._id}
+                    // key={p._id}
                     href={`/products/${p._id}`}
                   >
                     <div className="card product-item border-0 mb-4">

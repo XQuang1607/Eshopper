@@ -15,9 +15,9 @@ const Categories = ({ productsOfCateogory }) => {
       <div className="container-fluid pt-5">
         <div className="row px-xl-5 pb-3">
           {productsOfCateogory.map((cate) => (
-            <div className="col-lg-4 col-md-6 pb-1">
+            <div className="col-lg-4 col-md-6 pb-1" key={cate._id}>
               <Link  
-                key={cate._id}
+                // key={cate._id}
                 href={`/shop`}
               >
                 <div

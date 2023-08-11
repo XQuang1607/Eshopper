@@ -31,10 +31,10 @@ function ProductDetail(props) {
                 </h2>
               </div>
                 {productsOfCategoryShop.map((cat) => (
-                  <div style={{fontSize: '30px'}}>
+                  <div style={{fontSize: '30px'}} key={cat.products._id}>
                     <Link
                       // style={{ height: "80px" }}
-                      key={cat.products._id}
+                      // key={cat.products._id}
                       href={`/products/${cat._id}`}
                     >
                       <div style={{fontSize: '30px'}}>
