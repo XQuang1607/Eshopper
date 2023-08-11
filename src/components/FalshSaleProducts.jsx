@@ -38,18 +38,18 @@ const FlashSale = ({ flashSale, handleAddToCart  }) => {
                       </h6>
                     </div>
                   </div>
-                </div>
-              </Link>
                   <div className="card-footer d-flex justify-content-between bg-light border">
-                    <a href={`/products/${flash._id}`} className="btn btn-sm text-dark p-0">
+                    <div href={`/products/${flash._id}`} className="btn btn-sm text-dark p-0">
                       <i className="fas fa-eye text-primary mr-1" />
                       View Detail
-                    </a>
+                    </div>
                     <div  className="btn btn-sm text-dark p-0" onClick={handleAddToCart}>
                       <i className="fas fa-shopping-cart text-primary mr-1" />
                       Add To Cart
                     </div>
                   </div>
+                </div>
+              </Link>
             </div>
           ))}
         </div>

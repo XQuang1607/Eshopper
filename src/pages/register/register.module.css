@@ -9,7 +9,8 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    max-width: 430px;
+    /* max-width: 430px; */
+    max-width: 620px;
     width: 100%;
     background: #fff;
     border-radius: 7px;
@@ -95,4 +96,30 @@
 
 .signup label:hover {
     text-decoration: underline;
+}
+
+
+/* .password-toggle-icon {
+    cursor: pointer;
+    user-select: none;
+    font-size: 18px;
+    margin-left: -30px;
+} */
+
+.password_input_wrapper {
+    position: relative;
+}
+
+.password_input {
+    padding-right: 30px;
+    /* Add some right padding to make space for the toggle icon */
+}
+
+.password_toggle_icon {
+    padding-bottom: 20px;
+    position: absolute;
+    top: 50%;
+    right: 5px;
+    transform: translateY(-50%);
+    cursor: pointer;
 }

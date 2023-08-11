@@ -261,12 +261,12 @@ const totalPrice = totalPrice1 + shippingFee;
                                 {products.map((p) => (
                                     <tr key={p._id}>
                                         <td className="align-middle" >
-                                            <input type="checkbox" style={{ marginLeft: "-50px" }}
+                                            <input type="checkbox" style={{ marginLeft: "-25px" }}
                                                 checked={checkedProducts.includes(p._id)}
                                                 onChange={() => handleCheckboxChange(p._id)}
                                             />
                                             <Link href={`/products/${p.productId._id}`} >
-                                                <img src={p.productId.cover} alt="" style={{ width: 50, marginLeft: "25px", marginRight: "20px" }} />{" "}
+                                                <img src={p.productId.cover} alt="" style={{ width: "50px", marginLeft: "25px", marginRight: "20px" }} />{" "}
                                                 {p.productId.name}
                                             </Link>
 

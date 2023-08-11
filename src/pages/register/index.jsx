@@ -12,10 +12,21 @@ const LoginForm = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState("");
   const [lastName, setLastName] = useState("");
+  const [gender, setGender] = useState("Female");
+  const [showPassword, setShowPassword] = useState(false);
+  // birthday
+  const [dayOfBirth, setDayOfBirth] = useState("");
+  const [monthOfBirth, setMonthOfBirth] = useState("");
+  const [yearOfBirth, setYearOfBirth] = useState("");
+
   const router = useRouter();
 
   const handleEmailChange = (event) => {
     setEmail(event.target.value);
+  };
+
+  const handleTogglePassword = () => {
+    setShowPassword(!showPassword);
   };
 
   const handlePasswordChange = (event) => {
@@ -64,7 +75,7 @@ const LoginForm = () => {
         setTokenToLocalStorage(token);
 
         // Chuyển hướng đến trang sau khi đăng nhập thành công
-        router.push("/"); 
+        router.push("/");
       } else {
         alert("Email hoặc mật khẩu không đúng");
       }
@@ -76,19 +87,24 @@ const LoginForm = () => {
 
   const handleSignUp = async () => {
     try {
+
+      if (!dayOfBirth || !monthOfBirth || !yearOfBirth) {
+        alert("Vui lòng nhập đầy đủ ngày sinh");
+        return;
+      }
+
+      // Chuyển đổi ngày sinh sang định dạng phù hợp (ví dụ: "yyyy-mm-dd")
+      const birthday = `${yearOfBirth}-${monthOfBirth}-${dayOfBirth}`;
+
       const response = await axiosClient.post("/user/customers/register", {
-        // firstName : "Nguyen",
-        // lastName : "Cuong",
-        // phoneNumber : "0123123123",
-        // email :"cuong@gmail.com",
-        // address : " 30 Phan Chau Trinh",
-        // password :"123456",
-        firstName ,
-        lastName ,
+        firstName,
+        lastName,
         phoneNumber,
         email,
         address,
         password,
+        gender,
+        birthday,
       });
 
       if (response.data.payload) {
@@ -99,6 +115,10 @@ const LoginForm = () => {
         setEmail("");
         setAddress("");
         setPassword("");
+        setGender("Female");
+        setDayOfBirth("");
+        setMonthOfBirth("");
+        setYearOfBirth("");
       } else {
         alert("Đăng ký không thành công");
       }
@@ -122,6 +142,7 @@ const LoginForm = () => {
           <form onSubmit={isLogin ? handleSubmitLogin : handleSubmitSignUp}>
             {isLogin ? (
               <>
+                {/* Sign-in section without Bootstrap */}
                 <input type="email" value={email} onChange={handleEmailChange} placeholder="Enter your email" />
                 <input type="password" value={password} onChange={handlePasswordChange} placeholder="Enter your password" />
                 <a href="#">Forgot password?</a>
@@ -129,13 +150,119 @@ const LoginForm = () => {
               </>
             ) : (
               <>
-                <input type="text" value={firstName} onChange={handleFirstNameChange} placeholder="Enter your First Name" />
-                <input type="text" value={lastName} onChange={handleLastNameChange} placeholder="Enter your Last Name" />
-                <input type="email" value={email} onChange={handleEmailChange} placeholder="Enter your email" />
-                <input type="text" value={phoneNumber} onChange={handlePhoneChange} placeholder="Enter your Phone Number" />
-                <input type="text" value={address} onChange={handleAddressChange}  placeholder="Enter your address" />
-                <input type="password" value={password} onChange={handlePasswordChange} placeholder="Create a password" />
-                <input type="submit" className={styles.button} defaultValue="Signup" />
+                {/* Sign-up section with Bootstrap */}
+                <div className="row">
+                  <div className="col-md-6">
+                    <h5>Enter First Name </h5>
+                    <input type="text" value={firstName} onChange={handleFirstNameChange} placeholder="First Name" />
+                  </div>
+                  <div className="col-md-6">
+                    <h5>Enter Last Name </h5>
+                    <input type="text" value={lastName} onChange={handleLastNameChange} placeholder="Last Name" />
+                  </div>
+                </div>
+                <div className="row">
+                  <div className="col-md-6">
+                    <h5>Enter Email </h5>
+                    <input type="email" value={email} onChange={handleEmailChange} placeholder="Email" />
+                  </div>
+                  <div className="col-md-6">
+                    <h5>Enter Phone Number </h5>
+                    <input type="text" value={phoneNumber} onChange={handlePhoneChange} placeholder="Phone Number" />
+                  </div>
+                </div>
+                <div className="row">
+                  <div className="col-md-6">
+                    <h5>Enter Address </h5>
+                    <input type="text" value={address} onChange={handleAddressChange} placeholder="Address" />
+                  </div>
+                  <div className="col-md-6">
+                    <h5>Create a Password </h5>
+                    <div className={styles.password_input_wrapper}>
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        value={password}
+                        onChange={handlePasswordChange}
+                        placeholder="Create a password"
+                        className={styles.password_input}
+                      />
+                      <span
+                        className={styles.password_toggle_icon}
+                        onClick={handleTogglePassword}
+                      >
+                        {showPassword ? "🙈" : "👁️"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="row">
+                  <div className="col-md-6">
+                    <h5>Choose Gender</h5>
+                    <label style={{ width: '30px', height: '10px', marginRight: '60px' }}>
+                      <input type="radio" value="Male" checked={gender === "Male"} onChange={(e) => setGender(e.target.value)} />
+                      Male
+                    </label>
+                    <label style={{ width: '30px', height: '10px' }}>
+                      <input type="radio" value="Female" checked={gender === "Female"} onChange={(e) => setGender(e.target.value)} />
+                      Female
+                    </label>
+                    {/* You can add more options for different genders if needed */}
+                  </div>
+                  {/* <div className="col-md-6 form-group" style={{ display: 'flex' }}>
+                  <h5>Choose Gender</h5>
+                  </div> */}
+
+                 
+                  <div className="col-md-6 form-group">
+                    <h5>Date of Birth</h5>
+                    <div style={{ display: 'flex' }}>
+                    <select
+                      className="form-control col-md-4"
+                      value={dayOfBirth}
+                      onChange={(e) => setDayOfBirth(e.target.value)}
+                    >
+                      <option value="">Select day</option>
+                      {Array.from({ length: 31 }, (_, index) => index + 1).map((day) => (
+                        <option key={day} value={day}>
+                          {day}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      className="form-control col-md-4"
+                      value={monthOfBirth}
+                      onChange={(e) => setMonthOfBirth(e.target.value)}
+                    >
+                      <option value="">Select month</option>
+                      {Array.from({ length: 12 }, (_, index) => index).map((monthIndex) => {
+                        const monthName = new Date(0, monthIndex).toLocaleString('en', { month: 'long' });
+                        return (
+                          <option key={monthIndex} value={monthIndex + 1}>
+                            {monthName}
+                          </option>
+                        );
+                      })}
+                    </select>
+                    <select
+                      className="form-control col-md-4"
+                      value={yearOfBirth}
+                      onChange={(e) => setYearOfBirth(e.target.value)}
+                    >
+                      <option value="">Select year</option>
+                      {Array.from({ length: 2023 - 1950 + 1 }, (_, index) => 1950 + index).map((year) => (
+                        <option key={year} value={year}>
+                          {year}
+                        </option>
+                      ))}
+                    </select>
+                    </div>
+                  </div>
+                </div>
+                <div className="row">
+                  <div className="col-md-12">
+                    <input type="submit" className={styles.button} defaultValue="Signup" />
+                  </div>
+                </div>
               </>
             )}
           </form>

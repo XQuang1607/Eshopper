@@ -1,4 +1,4 @@
-import React, {useState,useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import jwt_decode from "jwt-decode";
 import axiosClient from "@/libraries/axiosClient";
@@ -10,63 +10,125 @@ import { getTokenFromLocalStorage } from "@/utils/tokenUtils";
 
 function ProductDetail(props) {
   const { product } = props;
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [customerId, setCustomerId] = useState(null);
   const [cartItems, setCartItems] = useState(0); // Ban đầu số lượng hàng trong giỏ hàng là 0
-  const [quantity, setQuantity] = useState(1); 
-  const [isLogin, setIsLogin] = useState(true); // Ban đầu hiển thị form đăng nhập
+  const [quantity, setQuantity] = useState(1);
   const router = useRouter();
 
-  const handleQuantityChange = (e) =>{
-    setQuantity(e.target.value)
-  }
+  // const handleQuantityChange = (e) => {
+  //   setQuantity(e.target.value)
+  // }
 
-  const handleAddToCart = () => {
-    // Cập nhật số lượng hàng trong giỏ hàng khi click vào nút "Add To Cart"
-    setCartItems((prevCartItems) => prevCartItems + 1);
+  const minQuantity = 1;
+  const maxQuantity = product.stock;
+
+  // const handleDecrement = () => {
+  //   if (quantity > minQuantity) {
+  //     setQuantity(quantity - 1);
+  //   }
+  // };
+
+  // const handleIncrement = () => {
+  //   if (quantity < maxQuantity) {
+  //     setQuantity(quantity + 1);
+  //   }
+  // };
+
+  const handleDecrement = () => {
+    if (quantity > minQuantity) {
+      setQuantity(quantity - 1);
+    }
+  };
+
+  const handleIncrement = () => {
+    if (quantity < maxQuantity) {
+      setQuantity(quantity + 1);
+    }
+  };
+
+  const handleQuantityChange = (event) => {
+    const newQuantity = parseInt(event.target.value);
+    if (!isNaN(newQuantity) && newQuantity >= minQuantity && newQuantity <= maxQuantity) {
+      setQuantity(newQuantity);
+    }
   };
 
   useEffect(() => {
     const token = getTokenFromLocalStorage();
 
     if (token) {
-        try {
-            // Giải mã token để lấy thông tin customerId
-            const decodedToken = jwt_decode(token);
-            const { _id: customerId } = decodedToken;
-            setCustomerId(customerId);
-            fetchCartData(customerId);
-        } catch (error) {
-            console.error("Error decoding token:", error);
-            setCustomerId(null);
-        }
+      try {
+        const decodedToken = jwt_decode(token);
+        const { _id: customerId } = decodedToken;
+        setCustomerId(customerId);
+      } catch (error) {
+        console.error("Error decoding token:", error);
+        setCustomerId(null);
+      }
     }
-}, []);
+  }, []);
 
-  const handleAddToCart1 = async () => {
-    const productId = router.query.id;
-    if(isLogin){
-        const token = getTokenFromLocalStorage();
+  useEffect(() => {
+    const checkLoggedIn = async () => {
+      const token = getTokenFromLocalStorage();
 
+      if (token) {
         try {
-          const response = await axiosClient.post(`user/cart`,
+          const response = await axiosClient.get("/user/orders", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (response.data.payload) {
+            setIsLoggedIn(true);
+          } else {
+            setIsLoggedIn(false);
+          }
+        } catch (error) {
+          console.error("Error checking login:", error);
+          setIsLoggedIn(false);
+        }
+      } else {
+        setIsLoggedIn(false);
+      }
+    };
+
+    checkLoggedIn();
+  }, []);
+
+  const handleAddToCart = async () => {
+    const productId = router.query.id;
+
+    if (isLoggedIn) {
+      const token = getTokenFromLocalStorage();
+
+      if (product.stock < 1) {
+        alert("Sản phẩm không còn đủ số lượng trong kho.");
+        return;
+      }
+
+      try {
+        const response = await axiosClient.post(
+          `/user/cart`,
           {
             customerId,
             productId,
-            quantity
+            quantity,
           },
           {
-            headers : {
-              Authorization : `Bearer ${token}`
-            }
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
-          )
-        } catch (error) {
-            console.log("Error add to cart", error);
-        }
+        );
+      } catch (error) {
+        console.error("Error adding to cart:", error);
+      }
     } else {
-      router.push("/register")
+      router.push("/register"); // Chuyển hướng đến trang đăng nhập
     }
-  }
+  };
   return (
     <>
       <Head>
@@ -75,7 +137,7 @@ function ProductDetail(props) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Header cartItems={cartItems}/>
+      <Header cartItems={cartItems} />
       <div className="container-fluid bg-secondary mb-5">
         <div
           className="d-flex flex-column align-items-center justify-content-center"
@@ -127,13 +189,13 @@ function ProductDetail(props) {
                 </div>
                 <small className="pt-1">(50 Reviews)</small>
               </div>
-              <div style={{display:'flex'}}>
-              <h3 className="font-weight-semi-bold mb-4" style={{paddingRight: '50px'}}>
-                <del style={{color : '#EF7A59'}}>${product.price}</del>
-              </h3>
-              <h3 className="font-weight-semi-bold mb-4" >${product.discountedPrice}</h3>
+              <div style={{ display: 'flex' }}>
+                <h3 className="font-weight-semi-bold mb-4" style={{ paddingRight: '50px' }}>
+                  <del style={{ color: '#EF7A59' }}>${product.price}</del>
+                </h3>
+                <h3 className="font-weight-semi-bold mb-4" >${product.discountedPrice}</h3>
               </div>
-              
+
               <p className="mb-4">
                 {/* Volup erat ipsum diam elitr rebum et dolor. Est nonumy elitr
                 erat diam stet sit clita ea. Sanc invidunt ipsum et, labore
@@ -273,17 +335,21 @@ function ProductDetail(props) {
                   style={{ width: 130 }}
                 >
                   <div className="input-group-btn">
-                    <button className="btn btn-primary btn-minus">
+                    <button className="btn btn-primary btn-minus" onClick={handleDecrement}>
                       <i className="fa fa-minus" />
                     </button>
                   </div>
                   <input
-                    type="text"
                     className="form-control bg-secondary text-center"
+                    onChange={handleQuantityChange}
+                    type="text"
+                    min={1}
+                    max={product.stock}
+                    value={quantity}
                     defaultValue={1}
                   />
                   <div className="input-group-btn">
-                    <button className="btn btn-primary btn-plus">
+                    <button className="btn btn-primary btn-plus" onClick={handleIncrement}>
                       <i className="fa fa-plus" />
                     </button>
                   </div>
@@ -314,184 +380,184 @@ function ProductDetail(props) {
             </div>
           </div>
         )}
-        
+
 
         {/* Description */}
         <div className="row px-xl-5">
-    <div className="col">
-      <div className="nav nav-tabs justify-content-center border-secondary mb-4">
-        <a
-          className="nav-item nav-link active"
-          data-toggle="tab"
-          href="#tab-pane-1"
-        >
-          Description
-        </a>
-        <a className="nav-item nav-link" data-toggle="tab" href="#tab-pane-2">
-          Information
-        </a>
-        <a className="nav-item nav-link" data-toggle="tab" href="#tab-pane-3">
-          Reviews (0)
-        </a>
-      </div>
-      <div className="tab-content">
-        <div className="tab-pane fade show active" id="tab-pane-1">
-          <h4 className="mb-3">Product Description</h4>
-          <p>
-            Eos no lorem eirmod diam diam, eos elitr et gubergren diam sea.
-            Consetetur vero aliquyam invidunt duo dolores et duo sit. Vero diam
-            ea vero et dolore rebum, dolor rebum eirmod consetetur invidunt sed
-            sed et, lorem duo et eos elitr, sadipscing kasd ipsum rebum diam.
-            Dolore diam stet rebum sed tempor kasd eirmod. Takimata kasd ipsum
-            accusam sadipscing, eos dolores sit no ut diam consetetur duo justo
-            est, sit sanctus diam tempor aliquyam eirmod nonumy rebum dolor
-            accusam, ipsum kasd eos consetetur at sit rebum, diam kasd invidunt
-            tempor lorem, ipsum lorem elitr sanctus eirmod takimata dolor ea
-            invidunt.
-          </p>
-          <p>
-            Dolore magna est eirmod sanctus dolor, amet diam et eirmod et ipsum.
-            Amet dolore tempor consetetur sed lorem dolor sit lorem tempor.
-            Gubergren amet amet labore sadipscing clita clita diam clita. Sea
-            amet et sed ipsum lorem elitr et, amet et labore voluptua sit rebum.
-            Ea erat sed et diam takimata sed justo. Magna takimata justo et amet
-            magna et.
-          </p>
-        </div>
-        <div className="tab-pane fade" id="tab-pane-2">
-          <h4 className="mb-3">Additional Information</h4>
-          <p>
-            Eos no lorem eirmod diam diam, eos elitr et gubergren diam sea.
-            Consetetur vero aliquyam invidunt duo dolores et duo sit. Vero diam
-            ea vero et dolore rebum, dolor rebum eirmod consetetur invidunt sed
-            sed et, lorem duo et eos elitr, sadipscing kasd ipsum rebum diam.
-            Dolore diam stet rebum sed tempor kasd eirmod. Takimata kasd ipsum
-            accusam sadipscing, eos dolores sit no ut diam consetetur duo justo
-            est, sit sanctus diam tempor aliquyam eirmod nonumy rebum dolor
-            accusam, ipsum kasd eos consetetur at sit rebum, diam kasd invidunt
-            tempor lorem, ipsum lorem elitr sanctus eirmod takimata dolor ea
-            invidunt.
-          </p>
-          <div className="row">
-            <div className="col-md-6">
-              <ul className="list-group list-group-flush">
-                <li className="list-group-item px-0">
-                  Sit erat duo lorem duo ea consetetur, et eirmod takimata.
-                </li>
-                <li className="list-group-item px-0">
-                  Amet kasd gubergren sit sanctus et lorem eos sadipscing at.
-                </li>
-                <li className="list-group-item px-0">
-                  Duo amet accusam eirmod nonumy stet et et stet eirmod.
-                </li>
-                <li className="list-group-item px-0">
-                  Takimata ea clita labore amet ipsum erat justo voluptua.
-                  Nonumy.
-                </li>
-              </ul>
+          <div className="col">
+            <div className="nav nav-tabs justify-content-center border-secondary mb-4">
+              <a
+                className="nav-item nav-link active"
+                data-toggle="tab"
+                href="#tab-pane-1"
+              >
+                Description
+              </a>
+              <a className="nav-item nav-link" data-toggle="tab" href="#tab-pane-2">
+                Information
+              </a>
+              <a className="nav-item nav-link" data-toggle="tab" href="#tab-pane-3">
+                Reviews (0)
+              </a>
             </div>
-            <div className="col-md-6">
-              <ul className="list-group list-group-flush">
-                <li className="list-group-item px-0">
-                  Sit erat duo lorem duo ea consetetur, et eirmod takimata.
-                </li>
-                <li className="list-group-item px-0">
-                  Amet kasd gubergren sit sanctus et lorem eos sadipscing at.
-                </li>
-                <li className="list-group-item px-0">
-                  Duo amet accusam eirmod nonumy stet et et stet eirmod.
-                </li>
-                <li className="list-group-item px-0">
-                  Takimata ea clita labore amet ipsum erat justo voluptua.
-                  Nonumy.
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <div className="tab-pane fade" id="tab-pane-3">
-          <div className="row">
-            <div className="col-md-6">
-              <h4 className="mb-4">1 review for "Colorful Stylish Shirt"</h4>
-              <div className="media mb-4">
-                <img
-                  src="img/user.jpg"
-                  alt="Image"
-                  className="img-fluid mr-3 mt-1"
-                  style={{ width: 45 }}
-                />
-                <div className="media-body">
-                  <h6>
-                    John Doe
-                    <small>
-                      {" "}
-                      - <i>01 Jan 2045</i>
-                    </small>
-                  </h6>
-                  <div className="text-primary mb-2">
-                    <i className="fas fa-star" />
-                    <i className="fas fa-star" />
-                    <i className="fas fa-star" />
-                    <i className="fas fa-star-half-alt" />
-                    <i className="far fa-star" />
+            <div className="tab-content">
+              <div className="tab-pane fade show active" id="tab-pane-1">
+                <h4 className="mb-3">Product Description</h4>
+                <p>
+                  Eos no lorem eirmod diam diam, eos elitr et gubergren diam sea.
+                  Consetetur vero aliquyam invidunt duo dolores et duo sit. Vero diam
+                  ea vero et dolore rebum, dolor rebum eirmod consetetur invidunt sed
+                  sed et, lorem duo et eos elitr, sadipscing kasd ipsum rebum diam.
+                  Dolore diam stet rebum sed tempor kasd eirmod. Takimata kasd ipsum
+                  accusam sadipscing, eos dolores sit no ut diam consetetur duo justo
+                  est, sit sanctus diam tempor aliquyam eirmod nonumy rebum dolor
+                  accusam, ipsum kasd eos consetetur at sit rebum, diam kasd invidunt
+                  tempor lorem, ipsum lorem elitr sanctus eirmod takimata dolor ea
+                  invidunt.
+                </p>
+                <p>
+                  Dolore magna est eirmod sanctus dolor, amet diam et eirmod et ipsum.
+                  Amet dolore tempor consetetur sed lorem dolor sit lorem tempor.
+                  Gubergren amet amet labore sadipscing clita clita diam clita. Sea
+                  amet et sed ipsum lorem elitr et, amet et labore voluptua sit rebum.
+                  Ea erat sed et diam takimata sed justo. Magna takimata justo et amet
+                  magna et.
+                </p>
+              </div>
+              <div className="tab-pane fade" id="tab-pane-2">
+                <h4 className="mb-3">Additional Information</h4>
+                <p>
+                  Eos no lorem eirmod diam diam, eos elitr et gubergren diam sea.
+                  Consetetur vero aliquyam invidunt duo dolores et duo sit. Vero diam
+                  ea vero et dolore rebum, dolor rebum eirmod consetetur invidunt sed
+                  sed et, lorem duo et eos elitr, sadipscing kasd ipsum rebum diam.
+                  Dolore diam stet rebum sed tempor kasd eirmod. Takimata kasd ipsum
+                  accusam sadipscing, eos dolores sit no ut diam consetetur duo justo
+                  est, sit sanctus diam tempor aliquyam eirmod nonumy rebum dolor
+                  accusam, ipsum kasd eos consetetur at sit rebum, diam kasd invidunt
+                  tempor lorem, ipsum lorem elitr sanctus eirmod takimata dolor ea
+                  invidunt.
+                </p>
+                <div className="row">
+                  <div className="col-md-6">
+                    <ul className="list-group list-group-flush">
+                      <li className="list-group-item px-0">
+                        Sit erat duo lorem duo ea consetetur, et eirmod takimata.
+                      </li>
+                      <li className="list-group-item px-0">
+                        Amet kasd gubergren sit sanctus et lorem eos sadipscing at.
+                      </li>
+                      <li className="list-group-item px-0">
+                        Duo amet accusam eirmod nonumy stet et et stet eirmod.
+                      </li>
+                      <li className="list-group-item px-0">
+                        Takimata ea clita labore amet ipsum erat justo voluptua.
+                        Nonumy.
+                      </li>
+                    </ul>
                   </div>
-                  <p>
-                    Diam amet duo labore stet elitr ea clita ipsum, tempor
-                    labore accusam ipsum et no at. Kasd diam tempor rebum magna
-                    dolores sed sed eirmod ipsum.
-                  </p>
+                  <div className="col-md-6">
+                    <ul className="list-group list-group-flush">
+                      <li className="list-group-item px-0">
+                        Sit erat duo lorem duo ea consetetur, et eirmod takimata.
+                      </li>
+                      <li className="list-group-item px-0">
+                        Amet kasd gubergren sit sanctus et lorem eos sadipscing at.
+                      </li>
+                      <li className="list-group-item px-0">
+                        Duo amet accusam eirmod nonumy stet et et stet eirmod.
+                      </li>
+                      <li className="list-group-item px-0">
+                        Takimata ea clita labore amet ipsum erat justo voluptua.
+                        Nonumy.
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="col-md-6">
-              <h4 className="mb-4">Leave a review</h4>
-              <small>
-                Your email address will not be published. Required fields are
-                marked *
-              </small>
-              <div className="d-flex my-3">
-                <p className="mb-0 mr-2">Your Rating * :</p>
-                <div className="text-primary">
-                  <i className="far fa-star" />
-                  <i className="far fa-star" />
-                  <i className="far fa-star" />
-                  <i className="far fa-star" />
-                  <i className="far fa-star" />
+              <div className="tab-pane fade" id="tab-pane-3">
+                <div className="row">
+                  <div className="col-md-6">
+                    <h4 className="mb-4">1 review for "Colorful Stylish Shirt"</h4>
+                    <div className="media mb-4">
+                      <img
+                        src="img/user.jpg"
+                        alt="Image"
+                        className="img-fluid mr-3 mt-1"
+                        style={{ width: 45 }}
+                      />
+                      <div className="media-body">
+                        <h6>
+                          John Doe
+                          <small>
+                            {" "}
+                            - <i>01 Jan 2045</i>
+                          </small>
+                        </h6>
+                        <div className="text-primary mb-2">
+                          <i className="fas fa-star" />
+                          <i className="fas fa-star" />
+                          <i className="fas fa-star" />
+                          <i className="fas fa-star-half-alt" />
+                          <i className="far fa-star" />
+                        </div>
+                        <p>
+                          Diam amet duo labore stet elitr ea clita ipsum, tempor
+                          labore accusam ipsum et no at. Kasd diam tempor rebum magna
+                          dolores sed sed eirmod ipsum.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-md-6">
+                    <h4 className="mb-4">Leave a review</h4>
+                    <small>
+                      Your email address will not be published. Required fields are
+                      marked *
+                    </small>
+                    <div className="d-flex my-3">
+                      <p className="mb-0 mr-2">Your Rating * :</p>
+                      <div className="text-primary">
+                        <i className="far fa-star" />
+                        <i className="far fa-star" />
+                        <i className="far fa-star" />
+                        <i className="far fa-star" />
+                        <i className="far fa-star" />
+                      </div>
+                    </div>
+                    <form>
+                      <div className="form-group">
+                        <label htmlFor="message">Your Review *</label>
+                        <textarea
+                          id="message"
+                          cols={30}
+                          rows={5}
+                          className="form-control"
+                          defaultValue={""}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label htmlFor="name">Your Name *</label>
+                        <input type="text" className="form-control" id="name" />
+                      </div>
+                      <div className="form-group">
+                        <label htmlFor="email">Your Email *</label>
+                        <input type="email" className="form-control" id="email" />
+                      </div>
+                      <div className="form-group mb-0">
+                        <input
+                          type="submit"
+                          defaultValue="Leave Your Review"
+                          className="btn btn-primary px-3"
+                        />
+                      </div>
+                    </form>
+                  </div>
                 </div>
               </div>
-              <form>
-                <div className="form-group">
-                  <label htmlFor="message">Your Review *</label>
-                  <textarea
-                    id="message"
-                    cols={30}
-                    rows={5}
-                    className="form-control"
-                    defaultValue={""}
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="name">Your Name *</label>
-                  <input type="text" className="form-control" id="name" />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="email">Your Email *</label>
-                  <input type="email" className="form-control" id="email" />
-                </div>
-                <div className="form-group mb-0">
-                  <input
-                    type="submit"
-                    defaultValue="Leave Your Review"
-                    className="btn btn-primary px-3"
-                  />
-                </div>
-              </form>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
       </div>
       <Footer />
     </>
@@ -503,7 +569,8 @@ export default ProductDetail;
 export async function getStaticPaths() {
   return {
     paths: [],
-    fallback: true,
+    // fallback: true,
+    fallback: "blocking",
   };
 }
 
