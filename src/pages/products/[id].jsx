@@ -478,7 +478,7 @@ function ProductDetail(props) {
               <div className="tab-pane fade" id="tab-pane-3">
                 <div className="row">
                   <div className="col-md-6">
-                    <h4 className="mb-4">1 review for "Colorful Stylish Shirt"</h4>
+                    <h4 className="mb-4">1 review for Colorful Stylish Shirt</h4>
                     <div className="media mb-4">
                       <img
                         src="img/user.jpg"

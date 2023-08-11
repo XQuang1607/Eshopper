@@ -3,6 +3,7 @@ import React from 'react'
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { getTokenFromLocalStorage,removeTokenFromLocalStorage } from '@/utils/tokenUtils';
+import Link from 'next/link';
 
 const Header = ({ cartItems, }) => {
   const [searchKeyword, setSearchKeyword] = useState("");
@@ -140,10 +141,10 @@ const Header = ({ cartItems, }) => {
                     <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                       {/* User information */}
                       <p className="dropdown-item">
-                        <a href={"/account"}>My Account</a>
+                        <Link href={"/account"}>My Account</Link>
                       </p>
                       <p className="dropdown-item">
-                        <a href={"/purchase"}>Purchase</a>
+                        <Link href={"/purchase"}>Purchase</Link>
                       </p>
 
                       {/* Logout button */}
@@ -154,20 +155,20 @@ const Header = ({ cartItems, }) => {
                   </div>
                 ) : (
                   // Render login button if not logged in
-                  <a href="/register" className="btn ml-2">
+                  <Link href="/register" className="btn ml-2">
                     Login
-                  </a>
+                  </Link>
                 )}
               </div>
               <div className='cart_right'>
-              <a href="" className="btn border">
+              <Link href="" className="btn border">
                 <i className="fas fa-heart text-primary" />
                 <span className="badge">0</span>
-              </a>
-              <a href={'/cart'} className="btn border ml-2">
+              </Link>
+              <Link href={'/cart'} className="btn border ml-2">
                 <i className="fas fa-shopping-cart text-primary" />
                 <span className="badge">{cartItems}</span>
-              </a>
+              </Link>
               </div>
             </div>
           </div>

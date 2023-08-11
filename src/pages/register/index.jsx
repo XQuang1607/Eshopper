@@ -3,6 +3,7 @@ import axiosClient from "@/libraries/axiosClient";
 import { setTokenToLocalStorage } from "../../utils/tokenUtils";
 import { useRouter } from "next/router";
 import styles from "./register.module.css"
+import Link from 'next/link';
 
 
 const LoginForm = () => {
@@ -145,7 +146,7 @@ const LoginForm = () => {
                 {/* Sign-in section without Bootstrap */}
                 <input type="email" value={email} onChange={handleEmailChange} placeholder="Enter your email" />
                 <input type="password" value={password} onChange={handlePasswordChange} placeholder="Enter your password" />
-                <a href="#">Forgot password?</a>
+                <Link href={'/'}>Forgot password?</Link>
                 <input type="submit" className={styles.button} defaultValue="Login" />
               </>
             ) : (
