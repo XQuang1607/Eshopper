@@ -148,7 +148,7 @@ const Header = ({ cartItems, }) => {
                       </p>
 
                       {/* Logout button */}
-                      <button className="dropdown-item" onClick={handleLogout}>
+                      <button className="dropdown-item" onClick={handleLogout} style={{color: "#D19C97"}}>
                         Logout
                       </button>
                     </div>

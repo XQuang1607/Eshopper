@@ -185,7 +185,7 @@ const Cart = () => {
                 if (selectedProduct) {
                     const { quantity, productId: { _id, discountedPrice, discount, name, cover } } = selectedProduct;
 
-                    return { _id, quantity, price: discountedPrice,discount, name, cover }; // Thêm thông tin ảnh và tên sản phẩm
+                    return { _id, quantity, price: discountedPrice, discount, name, cover }; // Thêm thông tin ảnh và tên sản phẩm
                 }
                 return null;
             }).filter((product) => product !== null)
@@ -213,7 +213,7 @@ const Cart = () => {
 
     const totalPrice1 = calculateTotalPrice1(products);
     const shippingFee = 10; // Phí ship cố định là 10 đô
-const totalPrice = totalPrice1 + shippingFee;
+    const totalPrice = totalPrice1 + shippingFee;
 
     const totalPrice2 = calculateTotalPrice2(products);
 
@@ -248,6 +248,8 @@ const totalPrice = totalPrice1 + shippingFee;
                         <table className="table table-bordered text-center mb-0">
                             <thead className="bg-secondary text-dark">
                                 <tr>
+                                    <th></th>
+                                    <th></th>
                                     <th>Products</th>
                                     <th>Price</th>
                                     <th>Discount</th>
@@ -261,16 +263,20 @@ const totalPrice = totalPrice1 + shippingFee;
                                 {products.map((p) => (
                                     <tr key={p._id}>
                                         <td className="align-middle" >
-                                            <input type="checkbox" style={{ marginLeft: "-25px" }}
+                                            <input type="checkbox" style={{ marginLeft: "8px" }}
                                                 checked={checkedProducts.includes(p._id)}
                                                 onChange={() => handleCheckboxChange(p._id)}
                                             />
-                                            <Link href={`/products/${p.productId._id}`} >
-                                                <img src={p.productId.cover} alt="" style={{ width: "50px", marginLeft: "25px", marginRight: "20px" }} />{" "}
-                                                {p.productId.name}
-                                            </Link>
 
                                         </td>
+                                        <td>
+                                        <Link href={`/products/${p.productId._id}`} >
+                                            <img src={p.productId.cover} alt="" style={{ width: "70px", height: "50px", marginLeft: "14px", marginRight: "20px" }} />
+                                        </Link>
+                                        </td>
+                                        <Link href={`/products/${p.productId._id}`} >
+                                            {p.productId.name}
+                                        </Link>
                                         <td className="align-middle">${p.productId.price}</td>
                                         <td className="align-middle">{p.productId.discount}%</td>
                                         <td className="align-middle">
@@ -341,7 +347,7 @@ const totalPrice = totalPrice1 + shippingFee;
                                 <div className="d-flex justify-content-between">
                                     <h6 className="font-weight-medium">Shipping</h6>
                                     <h6 className="font-weight-medium">${shippingFee}</h6>
-                                   
+
                                 </div>
                             </div>
                             <div className="card-footer border-secondary bg-transparent">

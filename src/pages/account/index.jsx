@@ -7,9 +7,11 @@ import jwt_decode from "jwt-decode";
 import axiosClient from "@/libraries/axiosClient";
 import SellectAddress from '@/components/SellectAddress'
 import { apiGetPublicDistrict, apiGetPublicProvinces, apiGetPublicWard } from '@/services/app'
+import InputReadOnly from '@/components/InputReadOnly'
 
 
 const Account = () => {
+
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [fullName, setFullName] = useState('');
@@ -72,7 +74,12 @@ const Account = () => {
         }
     }, []);
 
-    const handleUpdateInfo = async () => {
+
+    
+
+    const handleUpdateInfo = async (event) => {
+        event.preventDefault();
+
         const token = getTokenFromLocalStorage();
 
         try {
@@ -107,6 +114,8 @@ const Account = () => {
             } else {
                 alert("Cập nhật thông tin không thành công");
             }
+
+
         } catch (error) {
             alert("Đã có lỗi khi cập nhật thông tin");
             console.error("Update error:", error);
@@ -114,9 +123,9 @@ const Account = () => {
     };
 
     // Begin Address
-    const handleSpecificAddressChange = (event) => {
-        setSpecificAddress(event.target.value);
-    };
+    // const handleSpecificAddressChange = (event) => {
+    //     setSpecificAddress(event.target.value);
+    // };
 
     // const updateAddressValue = () => {
     //     const newAddress = `${specificAddress} ${ward
@@ -134,8 +143,8 @@ const Account = () => {
 
     // useEffect(() => {
     //     updateAddressValue();
-    // // }, [specificAddress, ward, district, province]);
-    // }, [ ward, district, province]);
+    // }, [specificAddress, ward, district, province]);
+    // // }, [ ward, district, province]);
 
     useEffect(() => {
         const fetchPublicProvince = async () => {
@@ -186,7 +195,7 @@ const Account = () => {
                         img
                     </div>
                     <div className="col-lg-9 col-md-12">
-                        <h4 className="font-weight-semi-bold mb-4">Customer Address</h4>
+                        <h4 className="font-weight-semi-bold mb-4">Customer Account</h4>
                         <div className="row">
                             <div className="col-md-6 form-group">
                                 <label>First Name</label>
@@ -210,7 +219,6 @@ const Account = () => {
                                     placeholder="example@email.com"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-
                                 />
                             </div>
                             <div className="col-md-6 form-group">
@@ -222,6 +230,7 @@ const Account = () => {
                                     value={phoneNumber}
                                     onChange={(e) => setPhoneNumber(e.target.value)}
                                 />
+
                             </div>
                             <div className="col-md-6 form-group">
                                 <label>Gender</label>
@@ -240,35 +249,17 @@ const Account = () => {
                                     className="form-control"
                                     type="text"
                                     value={birthday}
-                                    onChange={(e) => setDateOfBirth(e.target.value)}
                                 />
                             </div>
                             <div className="col-md-6 form-group">
                                 <label>Address</label>
-                                <input className="form-control" type="text" placeholder="Doe"
-                                    value={address}
+                                <input className="form-control" type="text" placeholder="Address"
+                                    value={address}  // Use the address state here to display the previously saved address
                                     onChange={(e) => setAddress(e.target.value)}
+
                                 />
                             </div>
-                            <div className="col-md-4 form-group">
-                                <SellectAddress type='province' value={province} setValue={setProvince} options={provinces} label='Province/City(Tỉnh)' />
-                            </div>
-                            <div className="col-md-4 form-group">
-                                <SellectAddress reset={reset} type='district' value={district} setValue={setDistrict} options={districts} label='District(Quận)' />
-                            </div>
-                            <div className="col-md-4 form-group">
-                                <SellectAddress reset={reset} type='ward' value={ward} setValue={setWard} options={wards} label='Wards(phường)' />
-                            </div>
-                            <div className="col-md-12 form-group">
-                                <label style={{ marginRight: '20px' }}>Address : </label>
-                                <input
-                                    type="text"
-                                    value={specificAddress}
-                                    onChange={handleSpecificAddressChange}
-                                    placeholder="Nhập địa chỉ cụ thể"
-                                />
-                                
-                            </div>
+
                             <button className="btn btn-primary" onClick={handleUpdateInfo}>
                                 Update Information
                             </button>
