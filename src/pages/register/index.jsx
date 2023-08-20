@@ -78,10 +78,11 @@ const LoginForm = () => {
         // Chuyển hướng đến trang sau khi đăng nhập thành công
         router.push("/");
       } else {
-        alert("Email hoặc mật khẩu không đúng");
+        // alert("Email hoặc mật khẩu không đúng");
+        alert("Email or password is incorrect");
       }
     } catch (error) {
-      alert("Email hoặc mật khẩu không đúng");
+      alert("Email or password is incorrect");
       console.error("Error logging in:", error);
     }
   };
@@ -90,7 +91,8 @@ const LoginForm = () => {
     try {
 
       if (!dayOfBirth || !monthOfBirth || !yearOfBirth) {
-        alert("Vui lòng nhập đầy đủ ngày sinh");
+        // alert("Vui lòng nhập đầy đủ ngày sinh");
+        alert("Please enter full date of birth");
         return;
       }
 
@@ -109,7 +111,7 @@ const LoginForm = () => {
       });
 
       if (response.data.payload) {
-        alert("Đăng ký thành công")
+        alert("Sign Up Success!")
         setFirstName("");
         setLastName("");
         setPhoneNumber("");
@@ -121,11 +123,12 @@ const LoginForm = () => {
         setMonthOfBirth("");
         setYearOfBirth("");
       } else {
-        alert("Đăng ký không thành công");
+        alert("Registration failed");
       }
       console.log('««««« response.data.payload »»»»»', response.data.payload);
     } catch (errors) {
-      alert("Đã có lỗi thông tin đăng ký", errors);
+      // alert("Đã có lỗi thông tin đăng ký", errors);
+      alert("There was an error in registration information", errors);
     }
   };
 

@@ -1,0 +1,20 @@
+.info_account,
+.change_pass:hover {
+    color: #C5837C;
+}
+
+.password_input {
+    position: relative;
+    /* Tạo một không gian cho biểu tượng */
+}
+
+.password_toggle {
+    position: absolute;
+    top: 50%;
+    /* Đặt biểu tượng ở giữa theo chiều dọc */
+    right: 10px;
+    /* Đặt biểu tượng ở phía bên phải cách viền */
+    transform: translateY(-50%);
+    /* Dịch chuyển biểu tượng lên 50% để căn giữa */
+    cursor: pointer;
+}

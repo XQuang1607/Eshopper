@@ -206,7 +206,8 @@ const Cart = () => {
         &discount=${encodeURIComponent(discount)}
         `);
         } else {
-            alert("Vui lòng chọn sản phẩm trước khi thanh toán")
+            // alert("Vui lòng chọn sản phẩm trước khi thanh toán")
+            alert("Please select the product before payment!")
         }
 
     };
@@ -274,9 +275,11 @@ const Cart = () => {
                                             <img src={p.productId.cover} alt="" style={{ width: "70px", height: "50px", marginLeft: "14px", marginRight: "20px" }} />
                                         </Link>
                                         </td>
-                                        <Link href={`/products/${p.productId._id}`} >
+                                        <td>
+                                        <Link href={`/products/${p.productId._id}`} className="align-middle">
                                             {p.productId.name}
                                         </Link>
+                                        </td>
                                         <td className="align-middle">${p.productId.price}</td>
                                         <td className="align-middle">{p.productId.discount}%</td>
                                         <td className="align-middle">

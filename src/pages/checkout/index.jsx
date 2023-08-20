@@ -46,7 +46,7 @@ const CheckOut = () => {
             try {
                 // Giải mã token để lấy thông tin customerId
                 const decodedToken = jwt_decode(token);
-                const { _id: customerId, firstName: firstName, lastName: lastName, phoneNumber: phoneNumber, email: email, address: address } = decodedToken;
+                const { _id: customerId, firstName: firstName, lastName: lastName, phoneNumber: phoneNumber, email: email, address: address, description:comment } = decodedToken;
                 setCustomerId(customerId);
                 setFirstName(firstName);
                 setLastName(lastName);
@@ -54,6 +54,7 @@ const CheckOut = () => {
                 setPhoneNumber(phoneNumber)
                 setFullName(firstName + " " + lastName)
                 setAddress(address)
+                setComment(comment)
             } catch (error) {
                 console.error("Error decoding token:", error);
                 setCustomerId(null);
@@ -161,13 +162,13 @@ const CheckOut = () => {
                 orderData, 
                 { headers }
                 );
-                alert("Thanh cong")
+                alert("Your order was created successfully!")
                 console.log("Đơn hàng đã được tạo:", response.data);
 
                 router.push("/checkoutProcess")
 
             } catch (error) {
-                alert("Lỗi!!!Tạo đơn hàng thất bại", error);
+                alert("Error!!!Order creation failed", error);
             }
         }
     }
